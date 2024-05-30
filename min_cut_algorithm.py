@@ -1,4 +1,4 @@
-# An algorithm to find the minimum cut of a graph from its edges
+# Min cut problem algorithm 2024, github.com/RokNikolic
 
 import os
 import time
@@ -36,39 +36,35 @@ def min_cut(edges_input):
     vertex_set_list = [{i} for i in vertex_set]
     while len(vertex_set_list) > 2:
         edge = random.choice(edges)
-        edges.remove(edge)
+        # edges.remove(edge)
         vertices = edge.split(" ")
         new_vertex1 = {vertices[0]}
         new_vertex2 = {vertices[1]}
 
-        for joint_vertex in vertex_set_list:
+        update = True
+        break_count = 0
+        # Find vertex in list
+        for i in range(len(vertex_set_list) - 1, -1, -1):
+            if break_count == 2:
+                break
+            joint_vertex = vertex_set_list[i]
+            if vertices[0] in joint_vertex and vertices[1] in joint_vertex:
+                update = False
             if vertices[0] in joint_vertex:
                 new_vertex1 = joint_vertex
-                vertex_set_list.remove(joint_vertex)
-        for joint_vertex in vertex_set_list:
+                break_count += 1
+                continue
             if vertices[1] in joint_vertex:
                 new_vertex2 = joint_vertex
-                vertex_set_list.remove(joint_vertex)
+                break_count += 1
+                continue
 
-        new_vertex = new_vertex1 | new_vertex2
-        vertex_set_list.append(new_vertex)
-
-        print(vertex_set_list)
+        if update:
+            new_vertex1.update(new_vertex2)
+            vertex_set_list.remove(new_vertex2)
 
     num_of_connections = count_connections_between_nodes(vertex_set_list[0], vertex_set_list[1], edges)
-    print(num_of_connections)
-
-
-def min_cut_dict(edges_input):
-    edges = edges_input.split("\n")
-    if "" in edges:
-        edges.remove("")
-
-    vertex_dict = {}
-    for _ in edges:
-        edge = random.choice(edges)
-        edges.remove(edge)
-        vertices = edge.split(" ")
+    return num_of_connections
 
 
 if __name__ == "__main__":
@@ -76,10 +72,10 @@ if __name__ == "__main__":
     graph_list.sort()
 
     start = time.perf_counter()
-    for graph_name in graph_list[0:1]:
+    for graph_name in graph_list:
         print(f"Running algorithm on graph {graph_name}")
         graph = read_file(f'./graphs/{graph_name}')
-        min_cut(graph)
+        num_of_c = min_cut(graph)
+        print(num_of_c)
 
-    end = time.perf_counter()
-    print(f"All graphs cut in: {end - start :.3} seconds")
+    print(f"All graphs cut in: {time.perf_counter() - start :.3} seconds")
