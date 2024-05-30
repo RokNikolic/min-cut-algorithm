@@ -1,4 +1,4 @@
-# Min cut problem algorithm 2024, github.com/RokNikolic
+# Min cut problem with Karger’s algorithm 2024, github.com/RokNikolic
 
 import os
 import time
@@ -51,7 +51,7 @@ def min_cut(edges_input):
     vertex_set_list = [{i} for i in vertex_set]
     while len(vertex_set_list) > 2:
         edge = random.choice(edges)
-        edges.remove(edge)
+        # edges.remove(edge)  # My implementation is a lot faster when I do not remove any edges
         vertices = edge.split(" ")
         new_vertex1 = {vertices[0]}
         new_vertex2 = {vertices[1]}
@@ -85,7 +85,7 @@ def run_testing(graph_path, runs_to_find_opt, runs_to_find_average):
     graph = read_file(f'./graphs/{graph_path}')
     num_edge_vertex = get_vertex_and_edge_num(graph)
 
-    # Find optimal finding minimal of a lot of runs
+    # Find optimal by finding minimal of a lot of runs
     min_found = num_edge_vertex[1]
     for _ in range(runs_to_find_opt):
         num_of_connections = min_cut(graph)
@@ -115,9 +115,9 @@ if __name__ == "__main__":
     result_data = []
     for graph_name in graph_list:
         print(f"Running testing on graph {graph_name}")
-        result_data.append(run_testing(graph_name, 50, 10))
+        result_data.append(run_testing(graph_name, 50, 5))
     end = time.perf_counter()
 
-    col_names = ["Graph name", "(vertices, edges)", "Optimal", "Average runs"]
+    col_names = ["Graph name", "(vertex, edge)", "Opt", "Avr for opt"]
     print(tabulate(result_data, headers=col_names))
     print(f"Testing took: {(end - start) / 60 :.4} minutes")
