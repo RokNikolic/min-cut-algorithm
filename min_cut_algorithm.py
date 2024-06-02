@@ -87,7 +87,7 @@ def min_cut(edges_input):
     return num_of_connections
 
 
-def run_algorithm(graph, num_of_runs):
+def run_algorithm(graph, num_of_runs=20):
     """
     :param graph: a graph represented by a list of edges between vertices
     :param num_of_runs: the number of runs over which you want to find the minimum cut

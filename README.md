@@ -1,3 +1,3 @@
 ## Minimum cut algorithm implementation
 
-- Using Karger’s algorithm
+- We're Using Karger’s algorithm
