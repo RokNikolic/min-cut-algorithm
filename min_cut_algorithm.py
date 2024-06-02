@@ -38,6 +38,10 @@ def get_vertex_and_edge_num(edges_input):
 
 
 def min_cut(edges_input):
+    """
+    :param edges_input: the edges of a graph in the form of a list of connections
+    :return: the minimum number of connections cut found using Karger’s algorithm
+    """
     edges = edges_input.split("\n")
     if "" in edges:
         edges.remove("")
@@ -51,7 +55,9 @@ def min_cut(edges_input):
     vertex_set_list = [{i} for i in vertex_set]
     while len(vertex_set_list) > 2:
         edge = random.choice(edges)
-        # edges.remove(edge)  # My implementation is a lot faster when I do not remove any edges
+        # edges.remove(edge)
+        # The algorithm states to remove edges to self but in python it's a lot faster when you do not remove
+        # any edges but just ignore them, as it is slow to remove a random item in a list
         vertices = edge.split(" ")
         new_vertex1 = {vertices[0]}
         new_vertex2 = {vertices[1]}
@@ -81,30 +87,20 @@ def min_cut(edges_input):
     return num_of_connections
 
 
-def run_testing(graph_path, runs_to_find_opt, runs_to_find_average):
-    graph = read_file(f'./graphs/{graph_path}')
-    num_edge_vertex = get_vertex_and_edge_num(graph)
-
-    # Find optimal by finding minimal of a lot of runs
-    min_found = num_edge_vertex[1]
-    for _ in range(runs_to_find_opt):
+def run_algorithm(graph, num_of_runs):
+    """
+    :param graph: a graph represented by a list of edges between vertices
+    :param num_of_runs: the number of runs over which you want to find the minimum cut
+    :return: the minimum cut of a graph
+    The min_cut algorithm has an about 15% success rate, so running it 20x time is a good start
+    """
+    min_found = float('inf')
+    for _ in range(num_of_runs):
         num_of_connections = min_cut(graph)
         if num_of_connections < min_found:
             min_found = num_of_connections
 
-    # Find average over some runs of how long it takes to find optimal
-    times = []
-    for _ in range(runs_to_find_average):
-        runs = 0
-        while True:
-            runs += 1
-            num_of_connections = min_cut(graph)
-            if num_of_connections <= min_found:
-                times.append(runs)
-                break
-    average_time = sum(times) / len(times)
-
-    return [graph_path, num_edge_vertex, min_found, average_time]
+    return min_found
 
 
 if __name__ == "__main__":
@@ -114,10 +110,13 @@ if __name__ == "__main__":
     start = time.perf_counter()
     result_data = []
     for graph_name in graph_list:
-        print(f"Running testing on graph {graph_name}")
-        result_data.append(run_testing(graph_name, 50, 5))
+        print(f"Running algorithm on graph {graph_name}")
+        input_graph = read_file(f'./graphs/{graph_name}')
+        num_edge_vertex = get_vertex_and_edge_num(input_graph)
+        result = run_algorithm(input_graph, 20)
+        result_data.append([graph_name, num_edge_vertex, result])
     end = time.perf_counter()
 
-    col_names = ["Graph name", "(vertex, edge)", "Opt", "Avr for opt"]
+    col_names = ["Graph name", "(vertex, edge)", "Opt"]
     print(tabulate(result_data, headers=col_names))
     print(f"Testing took: {(end - start) / 60 :.4} minutes")
